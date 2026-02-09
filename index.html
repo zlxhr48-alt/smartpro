@@ -17,6 +17,12 @@
             --secret: #e74c3c;
             --lock: #ff9f43;
             --text-main: #2d3436;
+            
+            /* [책상 시인성 강화 색상] */
+            --seat-border-main: #94a3b8; /* 더 진해진 회색 테두리 */
+            --seat-bg-main: #ffffff;
+            --seat-locked-border: #e67e22; /* 더 진한 주황 테두리 */
+            --seat-locked-bg: #fffbf2;
         }
 
         body {
@@ -186,30 +192,48 @@
         .seat {
             width: 100%;
             height: 70px;
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            background: var(--seat-bg-main);
+            border: 2.5px solid var(--seat-border-main); /* 테두리 두께 및 색상 강화 */
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
+            font-weight: 800; /* 폰트 두께 강화 */
             cursor: pointer;
             position: relative;
-            font-size: 0.95rem;
+            font-size: 1rem;
             box-sizing: border-box;
             user-select: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 약간의 그림자로 입체감 */
+            transition: transform 0.1s;
         }
+        .seat:active { transform: scale(0.96); }
 
         .aisle { width: 100%; height: 70px; }
 
-        .seat.locked { border-color: var(--lock); background: #fff9f0; }
-        .lock-icon { position: absolute; top: 3px; right: 3px; font-size: 0.7rem; color: var(--lock); }
-        .seat.selected-for-swap { border-color: var(--selected); background: #fffdf0; z-index: 2; outline: 2px solid var(--selected); }
+        .seat.locked { 
+            border-color: var(--seat-locked-border); 
+            background: var(--seat-locked-bg); 
+            box-shadow: 0 2px 6px rgba(230, 126, 34, 0.2);
+        }
+        .lock-icon { position: absolute; top: 4px; right: 4px; font-size: 0.75rem; color: var(--seat-locked-border); }
         
-        .seat.empty { background: #f9fafb; border: 2px dashed #cbd5e1; color: transparent; cursor: default; }
+        .seat.selected-for-swap { 
+            border-color: var(--selected); 
+            background: #fffdf0; 
+            z-index: 2; 
+            outline: 3px solid var(--selected); 
+        }
+        
+        .seat.empty { 
+            background: #f1f5f9; 
+            border: 2.5px dashed #cbd5e1; 
+            color: transparent; 
+            cursor: default; 
+            box-shadow: none;
+        }
 
-        /* 기존 안내판 스타일 복구 */
         .info-panel {
             margin-top: 30px; padding: 25px; background: #f8f9fa; border-radius: 16px;
             font-size: 0.9rem; color: #4b5563; text-align: left; line-height: 1.8;
@@ -273,7 +297,6 @@
             <div id="seating-grid" class="grid"></div>
         </div>
         
-        <!-- 처음 보내주신 기능안내 텍스트로 복구 -->
         <div id="info-panel" class="info-panel">
             <b>📍 기능 안내</b>
             <div class="info-row"><span>기피 관계 설정:</span>상, 하, 좌, 우, 대각선 인접 자리 방지 우선 배치</div>
