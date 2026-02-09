@@ -25,7 +25,7 @@
             --seat-locked-bg: #fffbf2;
             
             /* [간격 설정] */
-            --aisle-gap: 25px; /* 요청에 따라 20px에서 25px로 변경 */
+            --aisle-gap: 25px; 
         }
 
         body {
@@ -149,30 +149,30 @@
         }
 
         #capture-zone { 
-            padding: 20px; 
+            padding: 40px; 
             background: white; 
             display: flex; 
             flex-direction: column; 
             width: 100%; 
-            min-width: 320px;
+            min-width: 800px; 
             box-sizing: border-box; 
         }
 
         .screen {
             background: #34495e;
             color: white;
-            padding: 10px;
-            width: 60%;
-            max-width: 300px;
+            padding: 12px;
+            width: 50%;
+            max-width: 250px;
             border-radius: 8px;
             font-weight: 800;
             text-align: center;
             margin: 0 auto;
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
 
-        .screen-top { margin-bottom: 30px; }
-        .screen-bottom { margin-top: 30px; order: 10; }
+        .screen-top { margin-bottom: 40px; }
+        .screen-bottom { margin-top: 40px; order: 10; }
 
         .grid { 
             display: grid; 
@@ -181,22 +181,21 @@
             justify-content: center;
         }
 
-        /* 짝꿍 모드: 통로 간격을 변수로 처리 */
         .grid.couple-mode {
-            grid-template-columns: repeat(2, minmax(60px, 150px)) var(--aisle-gap) repeat(2, minmax(60px, 150px)) var(--aisle-gap) repeat(2, minmax(60px, 150px)); 
+            grid-template-columns: repeat(2, 120px) var(--aisle-gap) repeat(2, 120px) var(--aisle-gap) repeat(2, 120px); 
             column-gap: 0px; 
-            row-gap: 10px;
+            row-gap: 15px;
         }
 
         .grid.single-mode {
-            grid-template-columns: repeat(var(--cols), minmax(60px, 150px));
-            column-gap: 10px;
-            row-gap: 10px;
+            grid-template-columns: repeat(var(--cols), 120px);
+            column-gap: 15px;
+            row-gap: 15px;
         }
 
         .seat {
-            width: 100%;
-            height: 70px;
+            width: 120px;
+            height: 80px;
             background: var(--seat-bg-main);
             border: 2.5px solid var(--seat-border-main);
             border-radius: 12px;
@@ -207,14 +206,14 @@
             font-weight: 800;
             cursor: pointer;
             position: relative;
-            font-size: 1rem;
+            font-size: 1.1rem;
             box-sizing: border-box;
             user-select: none;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: transform 0.1s;
         }
         
-        /* 짝꿍 모드에서 짝끼리 붙었을 때 테두리 겹침 방지 */
+        /* 짝꿍 모드 테두리 보정 */
         .grid.couple-mode .seat:nth-child(8n+1),
         .grid.couple-mode .seat:nth-child(8n+4),
         .grid.couple-mode .seat:nth-child(8n+7) {
@@ -231,13 +230,11 @@
         }
 
         .seat:active { transform: scale(0.96); }
-
-        .aisle { width: 100%; height: 70px; }
+        .aisle { width: 100%; height: 80px; }
 
         .seat.locked { 
             border-color: var(--seat-locked-border); 
             background: var(--seat-locked-bg); 
-            box-shadow: 0 2px 6px rgba(230, 126, 34, 0.2);
             z-index: 1; 
         }
         .lock-icon { position: absolute; top: 4px; right: 4px; font-size: 0.75rem; color: var(--seat-locked-border); }
@@ -255,13 +252,16 @@
             color: transparent; 
             cursor: default; 
             box-shadow: none;
-            z-index: 0;
         }
 
-        /* 캡처 시 빈자리 투명화를 위한 특수 클래스 */
-        .capturing-teacher .empty {
-            visibility: hidden !important;
+        /* [핵심] 캡처 전용 스타일: A4 최적화 */
+        .capturing-mode #capture-zone {
+            width: 800px !important; /* A4 가로 너비에 적합한 픽셀값 */
+            padding: 60px 40px !important;
+            margin: 0 !important;
         }
+        /* 저장 이미지에서는 빈자리 'X'를 완전히 숨김 */
+        .capturing-mode .empty { visibility: hidden !important; border: none !important; }
 
         .info-panel {
             margin-top: 30px; padding: 25px; background: #f8f9fa; border-radius: 16px;
@@ -269,14 +269,8 @@
             border: 1px solid #eee;
         }
         .info-panel b { color: var(--primary); font-size: 1rem; display: block; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
-        .info-row { margin-bottom: 8px; display: block; }
-        .info-row span { color: var(--primary); font-weight: bold; margin-right: 6px; }
-        .info-flex-wrap { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; }
-        .info-item { display: inline-flex; align-items: center; }
-        .info-item span { color: var(--primary); font-weight: bold; margin-right: 6px; }
-
+        
         footer { margin-top: 40px; color: #94a3b8; font-size: 0.85rem; text-align: center; font-weight: 500; }
-        footer span { color: var(--primary); font-weight: 700; }
         #secret-dot { position: fixed; bottom: 5px; right: 5px; width: 3px; height: 3px; background: transparent; z-index: 9999; }
     </style>
 </head>
@@ -329,14 +323,14 @@
         
         <div id="info-panel" class="info-panel">
             <b>📍 기능 안내</b>
-            <div class="info-row"><span>기피 관계 설정:</span>상, 하, 좌, 우, 대각선 인접 자리 방지 우선 배치</div>
-            <div class="info-row"><span>빈자리 설정:</span>명단에 'X' 입력 시 해당 위치 고정 및 투명 처리</div>
-            <div class="info-row"><span>S:</span>교사용 설정창 열기/닫기</div>
-            <div class="info-flex-wrap">
-                <div class="info-item"><span>H:</span>비밀 자리 저장</div>
-                <div class="info-item"><span>Shift+클릭:</span>비밀 자리 실행</div>
-                <div class="info-item"><span>더블 클릭:</span>고정(🔒)</div>
-                <div class="info-item"><span>클릭:</span>자리 교체</div>
+            <div class="info-row" style="margin-bottom:8px"><span>기피 관계 설정:</span>상, 하, 좌, 우, 대각선 인접 자리 방지</div>
+            <div class="info-row" style="margin-bottom:8px"><span>빈자리 설정:</span>명단에 'X' 입력 시 해당 위치 고정 및 투명 처리</div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; border-top:1px dashed #ddd; padding-top:10px; margin-top:10px">
+                <div><span>S:</span>설정창 토글</div>
+                <div><span>H:</span>비밀 저장</div>
+                <div><span>Shift+클릭:</span>비밀 실행</div>
+                <div><span>더블 클릭:</span>고정(🔒)</div>
+                <div><span>클릭:</span>자리 교체</div>
             </div>
         </div>
     </div>
@@ -357,38 +351,28 @@
     let bgmLoopTimer = null;
     let beatStep = 0;
 
-    // 데이터 자동 저장 함수
     function autoSave() {
-        const studentList = document.getElementById('student-list').value;
-        const avoidList = document.getElementById('avoid-list').value;
-        const layoutMode = document.querySelector('input[name="layout-mode"]:checked').value;
-        const customCols = document.getElementById('custom-cols').value;
-
-        localStorage.setItem('smartSeating_studentList', studentList);
-        localStorage.setItem('smartSeating_avoidList', avoidList);
-        localStorage.setItem('smartSeating_layoutMode', layoutMode);
-        localStorage.setItem('smartSeating_customCols', customCols);
+        localStorage.setItem('smartSeating_studentList', document.getElementById('student-list').value);
+        localStorage.setItem('smartSeating_avoidList', document.getElementById('avoid-list').value);
+        localStorage.setItem('smartSeating_layoutMode', document.querySelector('input[name="layout-mode"]:checked').value);
+        localStorage.setItem('smartSeating_customCols', document.getElementById('custom-cols').value);
     }
 
-    // 데이터 불러오기 함수
     function loadSavedData() {
-        const savedStudents = localStorage.getItem('smartSeating_studentList');
-        const savedAvoid = localStorage.getItem('smartSeating_avoidList');
-        const savedMode = localStorage.getItem('smartSeating_layoutMode');
-        const savedCols = localStorage.getItem('smartSeating_customCols');
-
-        if (savedStudents !== null) document.getElementById('student-list').value = savedStudents;
-        if (savedAvoid !== null) document.getElementById('avoid-list').value = savedAvoid;
-        if (savedCols !== null) document.getElementById('custom-cols').value = savedCols;
-        if (savedMode !== null) {
-            document.querySelector(`input[name="layout-mode"][value="${savedMode}"]`).checked = true;
+        const s = localStorage.getItem('smartSeating_studentList');
+        const a = localStorage.getItem('smartSeating_avoidList');
+        const m = localStorage.getItem('smartSeating_layoutMode');
+        const c = localStorage.getItem('smartSeating_customCols');
+        if (s !== null) document.getElementById('student-list').value = s;
+        if (a !== null) document.getElementById('avoid-list').value = a;
+        if (c !== null) document.getElementById('custom-cols').value = c;
+        if (m !== null) {
+            document.querySelector(`input[name="layout-mode"][value="${m}"]`).checked = true;
             handleModeChange();
         }
     }
 
-    window.onload = function() {
-        loadSavedData();
-    };
+    window.onload = loadSavedData;
 
     function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
     function playKick(time) {
@@ -513,13 +497,12 @@
         return false;
     }
 
-    function renderGrid(seats, cols, isTeacher, isPrinting = false) {
+    function renderGrid(seats, cols, isTeacher) {
         const grid = document.getElementById('seating-grid');
         const mode = document.querySelector('input[name="layout-mode"]:checked').value;
         grid.innerHTML = '';
         if (mode === 'couple') {
             grid.className = 'grid couple-mode';
-            grid.style.removeProperty('--cols');
         } else {
             grid.className = 'grid single-mode';
             grid.style.setProperty('--cols', cols);
@@ -575,22 +558,32 @@
         const zone = document.getElementById('capture-zone');
         const cols = getColCount();
         
-        if (isTeacher) {
-            zone.classList.add('capturing-teacher');
-        }
+        // 캡처용 특수 클래스 추가 (스타일 제어)
+        document.body.classList.add('capturing-mode');
+        
+        // 대상에 따라 렌더링
+        renderGrid(currentStudents, cols, isTeacher);
+        
+        // 렌더링 안정화 대기
+        await new Promise(resolve => setTimeout(resolve, 150));
 
-        renderGrid(currentStudents, cols, isTeacher, true);
-        
-        const canvas = await html2canvas(zone, { backgroundColor: "#ffffff", scale: 2 });
-        
-        if (isTeacher) {
-            zone.classList.remove('capturing-teacher');
-        }
+        // html2canvas 옵션: 너비 고정으로 A4 최적화
+        const canvas = await html2canvas(zone, { 
+            backgroundColor: "#ffffff", 
+            scale: 2, // 고해상도
+            useCORS: true,
+            logging: false,
+            width: 800, // 너비를 800px로 고정하여 A4 비율 유도
+            windowWidth: 800
+        });
         
         const link = document.createElement('a');
         link.download = `자리배치_${isTeacher ? "교사용" : "학생용"}.png`;
-        link.href = canvas.toDataURL(); link.click();
+        link.href = canvas.toDataURL('image/png'); 
+        link.click();
         
+        // 원래 상태로 복구
+        document.body.classList.remove('capturing-mode');
         renderGrid(currentStudents, cols, false);
     }
 </script>
