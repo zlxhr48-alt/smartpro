@@ -19,9 +19,9 @@
             --text-main: #2d3436;
             
             /* [책상 시인성 강화 색상] */
-            --seat-border-main: #94a3b8; /* 더 진해진 회색 테두리 */
+            --seat-border-main: #94a3b8; 
             --seat-bg-main: #ffffff;
-            --seat-locked-border: #e67e22; /* 더 진한 주황 테두리 */
+            --seat-locked-border: #e67e22; 
             --seat-locked-bg: #fffbf2;
         }
 
@@ -176,38 +176,56 @@
             width: 100%;
             margin: 0 auto;
             justify-content: center;
-            gap: 10px;
         }
 
+        /* 짝꿍 모드 수정: 짝 사이 간격 제거, 통로만 15px 유지 */
         .grid.couple-mode {
             grid-template-columns: repeat(2, minmax(60px, 150px)) 15px repeat(2, minmax(60px, 150px)) 15px repeat(2, minmax(60px, 150px)); 
-            column-gap: 5px;
+            column-gap: 0px; 
+            row-gap: 10px;
         }
 
         .grid.single-mode {
             grid-template-columns: repeat(var(--cols), minmax(60px, 150px));
             column-gap: 10px;
+            row-gap: 10px;
         }
 
         .seat {
             width: 100%;
             height: 70px;
             background: var(--seat-bg-main);
-            border: 2.5px solid var(--seat-border-main); /* 테두리 두께 및 색상 강화 */
+            border: 2.5px solid var(--seat-border-main);
             border-radius: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-weight: 800; /* 폰트 두께 강화 */
+            font-weight: 800;
             cursor: pointer;
             position: relative;
             font-size: 1rem;
             box-sizing: border-box;
             user-select: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 약간의 그림자로 입체감 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: transform 0.1s;
         }
+        /* 짝꿍 모드에서 짝끼리 붙었을 때 테두리 겹침 방지 (시각적 최적화) */
+        .grid.couple-mode .seat:nth-child(8n+1),
+        .grid.couple-mode .seat:nth-child(8n+4),
+        .grid.couple-mode .seat:nth-child(8n+7) {
+            border-right-width: 1.25px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .grid.couple-mode .seat:nth-child(8n+2),
+        .grid.couple-mode .seat:nth-child(8n+5),
+        .grid.couple-mode .seat:nth-child(8n+8) {
+            border-left-width: 1.25px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
         .seat:active { transform: scale(0.96); }
 
         .aisle { width: 100%; height: 70px; }
@@ -216,6 +234,7 @@
             border-color: var(--seat-locked-border); 
             background: var(--seat-locked-bg); 
             box-shadow: 0 2px 6px rgba(230, 126, 34, 0.2);
+            z-index: 1; /* 테두리 시인성 */
         }
         .lock-icon { position: absolute; top: 4px; right: 4px; font-size: 0.75rem; color: var(--seat-locked-border); }
         
@@ -232,6 +251,7 @@
             color: transparent; 
             cursor: default; 
             box-shadow: none;
+            z-index: 0;
         }
 
         .info-panel {
@@ -266,21 +286,21 @@
         <div class="setup-section">
             <div class="input-group">
                 <label>👤 학생 명단 (쉼표 구분, 빈자리 'X')</label>
-                <textarea id="student-list" placeholder="강민준, 고예은, X, 권도현..."></textarea>
+                <textarea id="student-list" placeholder="강민준, 고예은, X, 권도현..." oninput="autoSave()"></textarea>
             </div>
             <div class="input-group">
                 <label>🚫 기피 관계 (한 줄에 한 그룹)</label>
-                <textarea id="avoid-list" placeholder="예: 김철수, 박지민"></textarea>
+                <textarea id="avoid-list" placeholder="예: 김철수, 박지민" oninput="autoSave()"></textarea>
             </div>
         </div>
 
         <div class="mode-selector">
-            <label><input type="radio" name="layout-mode" value="couple" checked onchange="handleModeChange()"> 👫 짝꿍 모드</label>
-            <label><input type="radio" name="layout-mode" value="single" onchange="handleModeChange()"> 📏 한 줄 모드</label>
+            <label><input type="radio" name="layout-mode" value="couple" checked onchange="handleModeChange(); autoSave();"> 👫 짝꿍 모드</label>
+            <label><input type="radio" name="layout-mode" value="single" onchange="handleModeChange(); autoSave();"> 📏 한 줄 모드</label>
             
             <div id="col-settings" style="display: none; margin-left: 15px; align-items: center; gap: 8px;">
                 <label>가로 칸 수:</label>
-                <input type="number" id="custom-cols" value="6" min="1" max="12" style="padding:4px; width:45px; border:1px solid #ddd; border-radius:4px;">
+                <input type="number" id="custom-cols" value="6" min="1" max="12" style="padding:4px; width:45px; border:1px solid #ddd; border-radius:4px;" oninput="autoSave()">
             </div>
         </div>
     </div>
@@ -326,6 +346,40 @@
     let nextBeatTime = 0;
     let bgmLoopTimer = null;
     let beatStep = 0;
+
+    // 데이터 자동 저장 함수
+    function autoSave() {
+        const studentList = document.getElementById('student-list').value;
+        const avoidList = document.getElementById('avoid-list').value;
+        const layoutMode = document.querySelector('input[name="layout-mode"]:checked').value;
+        const customCols = document.getElementById('custom-cols').value;
+
+        localStorage.setItem('smartSeating_studentList', studentList);
+        localStorage.setItem('smartSeating_avoidList', avoidList);
+        localStorage.setItem('smartSeating_layoutMode', layoutMode);
+        localStorage.setItem('smartSeating_customCols', customCols);
+    }
+
+    // 데이터 불러오기 함수
+    function loadSavedData() {
+        const savedStudents = localStorage.getItem('smartSeating_studentList');
+        const savedAvoid = localStorage.getItem('smartSeating_avoidList');
+        const savedMode = localStorage.getItem('smartSeating_layoutMode');
+        const savedCols = localStorage.getItem('smartSeating_customCols');
+
+        if (savedStudents !== null) document.getElementById('student-list').value = savedStudents;
+        if (savedAvoid !== null) document.getElementById('avoid-list').value = savedAvoid;
+        if (savedCols !== null) document.getElementById('custom-cols').value = savedCols;
+        if (savedMode !== null) {
+            document.querySelector(`input[name="layout-mode"][value="${savedMode}"]`).checked = true;
+            handleModeChange();
+        }
+    }
+
+    // 초기화 시 데이터 로드
+    window.onload = function() {
+        loadSavedData();
+    };
 
     function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
     function playKick(time) {
