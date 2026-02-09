@@ -23,6 +23,9 @@
             --seat-bg-main: #ffffff;
             --seat-locked-border: #e67e22; 
             --seat-locked-bg: #fffbf2;
+            
+            /* [간격 설정] */
+            --aisle-gap: 25px; /* 요청에 따라 20px에서 25px로 변경 */
         }
 
         body {
@@ -178,9 +181,9 @@
             justify-content: center;
         }
 
-        /* 짝꿍 모드 수정: 짝 사이 간격 제거, 통로만 15px 유지 */
+        /* 짝꿍 모드: 통로 간격을 변수로 처리 */
         .grid.couple-mode {
-            grid-template-columns: repeat(2, minmax(60px, 150px)) 15px repeat(2, minmax(60px, 150px)) 15px repeat(2, minmax(60px, 150px)); 
+            grid-template-columns: repeat(2, minmax(60px, 150px)) var(--aisle-gap) repeat(2, minmax(60px, 150px)) var(--aisle-gap) repeat(2, minmax(60px, 150px)); 
             column-gap: 0px; 
             row-gap: 10px;
         }
@@ -272,7 +275,8 @@
         .info-item { display: inline-flex; align-items: center; }
         .info-item span { color: var(--primary); font-weight: bold; margin-right: 6px; }
 
-        footer { margin-top: 30px; color: #bdc3c7; font-size: 0.8rem; text-align: center; }
+        footer { margin-top: 40px; color: #94a3b8; font-size: 0.85rem; text-align: center; font-weight: 500; }
+        footer span { color: var(--primary); font-weight: 700; }
         #secret-dot { position: fixed; bottom: 5px; right: 5px; width: 3px; height: 3px; background: transparent; z-index: 9999; }
     </style>
 </head>
@@ -338,7 +342,7 @@
     </div>
 </div>
 
-<footer>made by GiGA Mini</footer>
+<footer>Created by <span>GiGA Mini</span></footer>
 
 <script>
     let secretLayout = null; 
@@ -571,17 +575,14 @@
         const zone = document.getElementById('capture-zone');
         const cols = getColCount();
         
-        // 교사용 저장 시 빈자리 책상을 완전히 숨기기 위해 클래스 추가
         if (isTeacher) {
             zone.classList.add('capturing-teacher');
         }
 
         renderGrid(currentStudents, cols, isTeacher, true);
         
-        // 캡처 실행
         const canvas = await html2canvas(zone, { backgroundColor: "#ffffff", scale: 2 });
         
-        // 캡처 후 상태 복구
         if (isTeacher) {
             zone.classList.remove('capturing-teacher');
         }
@@ -590,7 +591,6 @@
         link.download = `자리배치_${isTeacher ? "교사용" : "학생용"}.png`;
         link.href = canvas.toDataURL(); link.click();
         
-        // 기본 뷰로 다시 렌더링
         renderGrid(currentStudents, cols, false);
     }
 </script>
